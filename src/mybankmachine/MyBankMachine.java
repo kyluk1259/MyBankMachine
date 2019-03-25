@@ -58,7 +58,7 @@ public class MyBankMachine {
      */
     public static void main(String[] args) {
         init();
-        main();
+        atmScreen();
     }
 
     public static void init() {
@@ -93,10 +93,10 @@ public class MyBankMachine {
         numbers.setMaximum(Double.MAX_VALUE);
         numbers.setAllowsInvalid(true);
         numbers.setCommitsOnValidEdit(true);
-        
+
     }
 
-    public static void main() {
+    public static void atmScreen() {
 
         atm = new Font("Arial", Font.BOLD, 30);
 
@@ -109,7 +109,6 @@ public class MyBankMachine {
         main.setSize(600, 600);
 
     }
-
 
     public static void draw() {
 
@@ -132,7 +131,7 @@ public class MyBankMachine {
         money.setFont(atm);
         money.setForeground(Color.BLACK);
         Dimension size = money.getPreferredSize();
-        money.setBounds(600 / 2, 100, size.width, size.height);
+        money.setBounds(275, 100, size.width, size.height);
 
         rectangle = new JPanel();
         rectangle.setBackground(Color.WHITE);
@@ -160,25 +159,19 @@ public class MyBankMachine {
         withdraw = new JButton("Withdraw");
         contentPane.add(withdraw);
         withdraw.setBorder(blackline);
-        withdraw.setBounds(75, 350, 200, 75);
+        withdraw.setBounds(325, 200, 200, 75);
         withdraw.addActionListener(click);
-
-        history = new JButton("Balance History");
-        contentPane.add(history);
-        history.setBorder(blackline);
-        history.setBounds(325, 200, 200, 75);
-        history.addActionListener(click);
 
         interest = new JButton("Compound Interest");
         contentPane.add(interest);
         interest.setBorder(blackline);
-        interest.setBounds(325, 350, 200, 75);
+        interest.setBounds(75, 350, 200, 75);
         interest.addActionListener(click);
 
         close = new JButton("Exit Account");
         contentPane.add(close);
         close.setBorder(blackline);
-        close.setBounds(200, 475, 200, 75);
+        close.setBounds(325, 350, 200, 75);
         close.addActionListener(click);
 
         accept = new JButton("");
@@ -190,8 +183,8 @@ public class MyBankMachine {
         cancel.setBounds(75, 475, 200, 75);
 
     }
-    
-     public static void depositWindow() {
+
+    public static void depositWindow() {
 
         window = 1;
 
@@ -221,13 +214,13 @@ public class MyBankMachine {
         depositPane.add(input);
         depositPane.add(accept);
         depositPane.add(cancel);
-        
+
         current = depositWindow;
         current.setVisible(true);
-        
+
     }
-     
-      public static void withdrawWindow() {
+
+    public static void withdrawWindow() {
 
         window = 2;
 
@@ -257,7 +250,7 @@ public class MyBankMachine {
         withdrawPane.add(input);
         withdrawPane.add(accept);
         withdrawPane.add(cancel);
-        
+
         current = withdrawWindow;
         current.setVisible(true);
     }
@@ -295,22 +288,29 @@ public class MyBankMachine {
 
                         String in = input.getText();
                         in = in.replace(",", "");
-                        System.out.print(input.getText()+"\n");
+                        System.out.print(input.getText() + "\n");
                         depositAmt = Double.parseDouble(input.getText());
-                                                System.out.println(depositAmt);
+                        System.out.println(depositAmt);
                         balance += depositAmt;
                         dispBalance = two.format(balance);
                         money.setText("$" + dispBalance);
                         size = money.getPreferredSize();
                         money.setBounds(275, 100, size.width, size.height);
                         input.setText("0");
-                        
 
                     case 2:
 
                         in = input.getText();
                         in = in.replace(",", "");
-                        withdrawAmt = Double.parseDouble(in);
+
+                        for (int i = 0; i < in.length(); i++) {
+                            if (in.charAt(i) < 47 && in.charAt(i) > 58) {
+                                input.setText("0");                   
+                                break;
+                            } else {
+                                withdrawAmt = Double.parseDouble(in);
+                            }
+                        }
                         if (withdrawAmt > balance) {
                             input.setText("0");
                         } else {
