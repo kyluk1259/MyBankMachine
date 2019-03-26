@@ -51,7 +51,7 @@ public class MyBankMachine {
     public static JFormattedTextField input;
     public static JLabel money;
     public static NumberFormat number = NumberFormat.getNumberInstance();
-    public static NumberFormatter numbers = new NumberFormatter(number);
+    public static NumberFormatter numbers = new NumberFormatter(two);
 
     /**
      * @param args the command line arguments
@@ -61,6 +61,7 @@ public class MyBankMachine {
         atmScreen();
     }
 
+    //Initialize all data according to ATM inputs
     public static void init() {
         account = new ATM();
 
@@ -96,6 +97,7 @@ public class MyBankMachine {
 
     }
 
+    //Set up ATM screen with correct information
     public static void atmScreen() {
 
         atm = new Font("Arial", Font.BOLD, 30);
@@ -110,6 +112,7 @@ public class MyBankMachine {
 
     }
 
+    //Draw primary JFrame for user
     public static void draw() {
 
         dispBalance = two.format(balance);
@@ -148,6 +151,7 @@ public class MyBankMachine {
         main.setVisible(true);
     }
 
+    //Display buttons
     public static void buttons() {
 
         deposit = new JButton("Deposit");
@@ -184,6 +188,7 @@ public class MyBankMachine {
 
     }
 
+    //Displays deposit window to user
     public static void depositWindow() {
 
         window = 1;
@@ -220,6 +225,7 @@ public class MyBankMachine {
 
     }
 
+    //Displays withdraw screen to user
     public static void withdrawWindow() {
 
         window = 2;
@@ -255,31 +261,64 @@ public class MyBankMachine {
         current.setVisible(true);
     }
 
+    public static void interestWindow() {
+
+        window = 3;
+
+        interestWindow = new JFrame("Interest");
+        interestWindow.setSize(main.getSize());
+        interestWindow.setDefaultCloseOperation(JFrame.DO_NOTHING_ON_CLOSE);
+        interestWindow.setLocation(WIDTH / 2, HEIGHT / 2);
+        interestWindow.setAlwaysOnTop(true);
+
+        interestPane = (JPanel) interestWindow.getContentPane();
+        interestPane.setLayout(null);
+        interestPane.setBackground(background);
+
+        JLabel dollarSign = new JLabel("$");
+        dollarSign.setFont(atm);
+        dollarSign.setForeground(Color.BLACK);
+        dollarSign.setBounds(210, 200, 40, 40);
+
+        accept.setText("Compound Interest");
+        accept.addActionListener(click);
+
+        cancel.addActionListener(click);
+
+        interestPane.add(money);
+        interestPane.add(rectangle);
+        interestPane.add(dollarSign);
+        interestPane.add(input);
+        interestPane.add(accept);
+        interestPane.add(cancel);
+
+        current = interestWindow;
+        current.setVisible(true);
+    }
+
+    //This method is an action listener to perform an action when a button is pressed
     public static ActionListener click = new ActionListener() {
         public void actionPerformed(ActionEvent e) {
-            if (e.getSource() == deposit) {
+            if (e.getSource() == deposit) {     //open deposit window
                 depositWindow();
                 main.setFocusableWindowState(false);
             }
 
-            if (e.getSource() == withdraw) {
+            if (e.getSource() == withdraw) {    //open withdraw window
                 withdrawWindow();
                 main.setFocusableWindowState(false);
             }
 
-            if (e.getSource() == history) {
-
+            if (e.getSource() == interest) {    //open interest window
+                interestWindow();
+                main.setFocusableWindowState(false);
             }
 
-            if (e.getSource() == interest) {
-
-            }
-
-            if (e.getSource() == close) {
+            if (e.getSource() == close) {       //close program
                 System.exit(0);
             }
 
-            if (e.getSource() == accept) {
+            if (e.getSource() == accept) {      //accept input
 
                 Dimension size = new Dimension();
 
@@ -287,25 +326,31 @@ public class MyBankMachine {
                     case 1:
 
                         String in = input.getText();
-                        in = in.replace(",", "");
-                        System.out.print(input.getText() + "\n");
-                        depositAmt = Double.parseDouble(input.getText());
-                        System.out.println(depositAmt);
-                        balance += depositAmt;
-                        dispBalance = two.format(balance);
-                        money.setText("$" + dispBalance);
-                        size = money.getPreferredSize();
-                        money.setBounds(275, 100, size.width, size.height);
-                        input.setText("0");
+                        for (int i = 0; i < in.length(); i++) {
+                            if (!isNotNumerical(in)) {
+                                input.setText("0");
+                                break;
+                            } else {
+                                depositAmt = Double.parseDouble(in);
+                            }
+                        }
+
+                        if (depositAmt > 0) {
+                            balance += depositAmt;
+                            dispBalance = two.format(balance);
+                            money.setText("$" + dispBalance);
+                            size = money.getPreferredSize();
+                            money.setBounds(275, 100, size.width, size.height);
+                            input.setText("0");
+                        }
 
                     case 2:
 
                         in = input.getText();
-                        in = in.replace(",", "");
 
                         for (int i = 0; i < in.length(); i++) {
-                            if (in.charAt(i) < 47 && in.charAt(i) > 58) {
-                                input.setText("0");                   
+                            if (!isNotNumerical(in)) {
+                                input.setText("0");
                                 break;
                             } else {
                                 withdrawAmt = Double.parseDouble(in);
@@ -321,10 +366,17 @@ public class MyBankMachine {
                             money.setBounds(275, 100, size.width, size.height);
                             input.setText("0");
                         }
+                    case 3:
+                        balance = balance * Math.pow(0.027, 1);
+                        dispBalance = two.format(balance);
+                        money.setText("$" + dispBalance);
+                        size = money.getPreferredSize();
+                        money.setBounds(275, 100, size.width, size.height);
+                        input.setText("0");
                 }
             }
 
-            if (e.getSource() == cancel) {
+            if (e.getSource() == cancel) {      //close new window
                 current.dispose();
                 main.setFocusableWindowState(true);
                 contentPane.removeAll();
@@ -333,7 +385,19 @@ public class MyBankMachine {
                 money.setText("$" + dispBalance);
                 Dimension size = money.getPreferredSize();
                 money.setBounds(275, 100, size.width, size.height);
+                contentPane.repaint();
             }
         }
     };
+
+    public static boolean isNotNumerical(String input) {   //check for number inputs, return true of false
+
+        for (int i = 0; i < input.length(); i++) {
+            if (input.charAt(i) < 46 && input.charAt(i) > 57 || input.charAt(i) == 47) {
+                return false;
+            }
+        }
+        return true;
+    }
+
 }
